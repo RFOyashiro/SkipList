@@ -16,10 +16,47 @@ SkipList::SkipList()
     m_nodes.push_back(&m_head);
 }
 
-Node *SkipList::contains(int value) const
-{
+/************************************/
+//Modifier les noms de fonctions
 
+//renvois nullptr si value déjà dans skiplist
+//renvois le node qui est juste avant l'insertion
+Node* SearchVal (int Value)
+{
+	Node* Actuel = m_Head.GetSon(0);
+	int Indice = Actuel.GetSons().size();
+	while (indice != -1 || Actuel.GetSon(Indice) != Value)
+	{
+		if (Actuel.GetSon(Indice) > Value) Indice--;
+		if (Actuel.GetSon(Indice) < Value) Acutel = Actuel.GetSon(Indice);
+	}
+	if (Actuel.GetSon(Indice) == Value) return nullptr;
+	else return Actuel;			
 }
+
+vector <Node*> SearchPtr (int Value)
+{
+	Node* Actuel = m_Head.GetSon(0);
+	vector <Node*> Ptrs;
+	int Indice = Actuel.GetSons().size();
+	Ptrs.push_back(Actuel.GetSon(Indice));
+	while (indice != -1 || Actuel.GetSon(Indice) != Value)
+	{
+		if (Actuel.GetSon(Indice) > Value) 
+		{
+			Indice--;
+			Ptrs.push_back(Actuel.GetSon(Indice));
+		}
+		if (Actuel.GetSon(Indice) < Value)
+		{
+			Acutel = Actuel.GetSon(Indice);
+			Ptrs.push_back(Actuel.GetSon(Indice));
+		}
+	}
+	return Ptrs;
+}
+
+/*******************************************/
 
 void SkipList::insert(int value)
 {

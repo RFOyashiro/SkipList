@@ -10,13 +10,15 @@ private:
     std::vector<Node *> m_sons;
 
 public:
-    Node();
+    Node(int elem);
 
     int cell() const;
     void setCell(int cell);
-    Node* getSon(int i) const;
+    Node* getSon(unsigned indice) const;
     std::vector<Node *> getSons() const;
     void setSons(const std::vector<Node *> &sons);
+    void setSon(int indice, Node* son);
+    
 };
 
 #endif // NODE_H
