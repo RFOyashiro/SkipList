@@ -16,27 +16,36 @@ SkipList::SkipList()
     m_nodes.push_back(&m_head);
 }
 
-//renvois nullptr si value déjà dans skiplist
-		//renvois le node qui est juste avant l'insertion
-Node* Search (int Value)
+Node *SkipList::contains(int value) const
 {
-	Node* Actuel = m_Head.GetSon(0);
-	int Indice = Actuel.GetSons().size();
-	while (indice != -1 || Actuel.GetSon(Indice) != Value)
-	{
-		if (Actuel.GetSon(Indice) > Value) Indice--;
-		if (Actuel.GetSon(Indice) < Value) Acutel = Actuel.GetSon(Indice);
-	}
-	if (Actuel.GetSon(Indice) == Value) return nullptr;
-	else return Actuel;			
+
 }
 
 void SkipList::insert(int value)
 {
-    Node * valueContained = contains(value);
-    if (valueContained == nullptr)
-    {
+    //Le premier noeud dont la valeur est inférieure à celle du nouveau
+    Node * nodeBeforeInsert = contains(value);
 
+    //Si la valeur à insérer n'est pas déjà présente dans la liste
+    if (nodeBeforeInsert != 0)
+    {
+        //Création du noeud à insérer
+        Node * nodeToInsert = new Node();
+
+        //Attribution de la valeur donnée au noeud que l'on insère
+        nodeToInsert->setCell(value);
+
+        //On lie le pointeur du noeud suivant à celui que l'on insère
+        nodeToInsert->getSons().push_back(nodeBeforeInsert->getSon(0));
+
+        //On lie le pointeur du noeud précédent à celui que l'on insère
+        nodeBeforeInsert->getSons().at(0) = nodeToInsert;
+
+
+        for (int i = 0; i < nodeBeforeInsert->getSons().size(); ++i)
+        {
+
+        }
     }
 }
 

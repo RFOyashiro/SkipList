@@ -10,6 +10,11 @@ void Node::setCell(int cell)
     m_cell = cell;
 }
 
+Node *Node::getSon(int i) const
+{
+
+}
+
 std::vector<Node *> Node::getSons() const
 {
     return m_sons;
