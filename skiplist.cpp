@@ -16,9 +16,19 @@ SkipList::SkipList()
     m_nodes.push_back(&m_head);
 }
 
-Node *SkipList::contains(int value) const
+//renvois nullptr si value déjà dans skiplist
+		//renvois le node qui est juste avant l'insertion
+Node* Search (int Value)
 {
-
+	Node* Actuel = m_Head.GetSon(0);
+	int Indice = Actuel.GetSons().size();
+	while (indice != -1 || Actuel.GetSon(Indice) != Value)
+	{
+		if (Actuel.GetSon(Indice) > Value) Indice--;
+		if (Actuel.GetSon(Indice) < Value) Acutel = Actuel.GetSon(Indice);
+	}
+	if (Actuel.GetSon(Indice) == Value) return nullptr;
+	else return Actuel;			
 }
 
 void SkipList::insert(int value)
