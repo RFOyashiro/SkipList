@@ -16,6 +16,8 @@ public:
     void remove(int value);
     std::vector<Node *> nodes() const;
     void setNodes(const std::vector<Node *> &nodes);
+    Node *SearchVal(int Value);
+    std::vector<Node *> SearchPtr(int Value);
 };
 
 #endif // SKIPLIST_H
