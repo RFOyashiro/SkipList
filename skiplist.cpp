@@ -78,13 +78,29 @@ void SkipList::insert(int value)
 
         for (int i = 0; i < nodeBeforeInsert->getSons().size(); ++i)
         {
-            //GO SKYPE ET DIS MOI CE QUE JE DOIS FAIRE POUR FINIR LE PROJET
+            //GO SKYPE ET DIS MOI CE QUE JE DOIS FAIRE POUR LE PROJET
         }
     }
 }
 
 void SkipList::remove(int value)
 {
+    Node * NodeToDeletion = SearchVal(value);
+    std::vector<Node *> ptrVisited = SearchPtr(value);
 
+    if (NodeToDeletion != 0)
+    {
+        unsigned i = 0;
+
+        //on cherche le node juste avant le node à supprimer
+        for ( ; i < ptrVisited.size(); ++i)
+            if (ptrVisited[i]->getSon(0) == NodeToDeletion) break;
+
+        //on set le fils du node précédent au fils du node à supprimer
+        ptrVisited[i]->setSon(0, NodeToDeletion->getSon(0));
+
+        //on set les fils des autres niveaux (indice 1, 2, 3...)
+
+    }
 }
 
