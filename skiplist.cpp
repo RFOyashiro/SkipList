@@ -78,7 +78,7 @@ void SkipList::insert(int value)
 
         for (int i = 0; i < nodeBeforeInsert->getSons().size(); ++i)
         {
-
+            //GO SKYPE ET DIS MOI CE QUE JE DOIS FAIRE POUR FINIR LE PROJET
         }
     }
 }
