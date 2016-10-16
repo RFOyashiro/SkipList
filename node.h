@@ -2,24 +2,35 @@
 #define NODE_H
 
 #include <vector>
+#include <iostream>
 
+template<class K, class V, int MAXLEVEL>
 class Node
 {
 private:
-    int m_cell;
-    std::vector<Node *> m_sons;
+
+    /*
+    int m_key;
+    std::vector<Node *> m_pointers;
+    std::vector<Node *> buildTower(int max);*/
 
 public:
+    K key;
+    V value;
+    Node<K, V, MAXLEVEL> *forwards[MAXLEVEL+1];
+
     Node();
-    Node(int elem);
+    Node(K searchedKey);
+    Node(K searchedKey, V value);
+    /*
+    Node();
+    Node(int max, int key);
 
-    int cell() const;
-    void setCell(int cell);
-    Node* getSon(unsigned indice) const;
-    std::vector<Node *> getSons() const;
-    void setSons(const std::vector<Node *> &sons);
-    void setSon(int indice, Node* son);
-
+    int key() const;
+    void setKey(int key);
+    Node* getPointer(int i) const;
+    std::vector<Node *> getPointers() const;
+    void setPointers(const std::vector<Node *> &pointers);*/
 };
 
 #endif // NODE_H

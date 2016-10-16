@@ -1,40 +1,78 @@
 #include "node.h"
+#include "time.h"
+#include "stdlib.h"
 
+/*
 Node::Node()
 {
-
+    m_pointers = std::vector<Node*>(1);
 }
 
-Node::Node (int elem) :
-    m_cell (elem) {}
-
-int Node::cell() const
+Node::Node(int max, int key = NULL)
 {
-    return m_cell;
+    m_key = key;
+    m_pointers = std::vector<Node*>(buildTower(max));
 }
 
-std::vector<Node *> Node::getSons() const
+int Node::key() const
 {
-    return m_sons;
+    return m_key;
 }
 
-Node* Node::getSon(unsigned indice) const
+void Node::setKey(int key)
 {
-    if (indice >= m_sons.size()) return 0;
-    return m_sons[indice];
+    m_key = key;
 }
 
-void Node::setSons(const std::vector<Node *> &sons)
+Node *Node::getPointer(int i) const
 {
-    m_sons = sons;
+    int size = getPointers().size();
+    if (i >= 0 && i < size)
+        return m_pointers.at(i);
+    return NULL;
 }
 
-void Node::setSon(int indice, Node* son)
+std::vector<Node *> Node::getPointers() const
 {
-    m_sons[indice] = son;
+    return m_pointers;
 }
 
-void Node::setCell(int cell)
+void Node::setPointers(const std::vector<Node *> &pointers)
 {
-    m_cell = cell;
+    m_pointers = pointers;
 }
+
+std::vector<Node *> Node::buildTower(int max)
+{
+    int sizeOfTower = 0;
+    for (int i = 1; i <= max; ++i)
+    {
+        if (rand() % 1 == 0) break;
+        ++sizeOfTower;
+    }
+    std::vector<Node *> Vtower (sizeOfTower);
+    return Vtower;
+}
+*/
+template<class K, class V, int MAXLEVEL>
+Node<K, V, MAXLEVEL>::Node()
+{
+    for (int i = 1; i < MAXLEVEL; ++i)
+        forwards[i] = NULL;
+}
+
+template<class K, class V, int MAXLEVEL>
+Node<K, V, MAXLEVEL>::Node(K searchedKey) :
+    key(searchedKey)
+{
+    Node();
+}
+
+template<class K, class V, int MAXLEVEL>
+Node<K, V, MAXLEVEL>::Node(K searchedKey, V value) :
+    key(searchedKey),
+    value(value)
+{
+    Node();
+}
+

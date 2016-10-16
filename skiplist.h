@@ -1,23 +1,33 @@
 #ifndef SKIPLIST_H
 #define SKIPLIST_H
 
-#include "node.h"
+#include "node.cpp"
 
+template<class K, class V, int MAXLEVEL = 16>
 class SkipList
 {
 private:
-    std::vector<Node *> m_nodes;
-    Node m_head;
+    K m_min_key;
+    K m_max_key;
+    int max_current_height;
+    Node<K, V, MAXLEVEL> *m_head = NULL;
+    Node<K, V, MAXLEVEL> *m_tail = NULL;
+    const int max_height;
+    int randomLevel();
 
 public:
-    SkipList();
-    Node *contains(int value) const;
-    void insert(int value);
-    void remove(int value);
-    std::vector<Node *> nodes() const;
-    void setNodes(const std::vector<Node *> &nodes);
-    Node *SearchVal(int Value);
-    std::vector<Node *> SearchPtr(int Value);
+    typedef K KeyType;
+    typedef V ValueType;
+    typedef Node<K, V, MAXLEVEL> NODE;
+
+    SkipList(K minKey, K maxKey);
+    virtual ~SkipList();
+
+    void insert(K searchedKey, V newValue);
+    void remove(K searchedKey);
+    const NODE *search(K searchedKey);
+    bool isEmpty() const;
+    void displayList();
 };
 
 #endif // SKIPLIST_H

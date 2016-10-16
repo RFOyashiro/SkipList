@@ -1,106 +1,135 @@
 #include "skiplist.h"
+#include "math.h"
+#include "time.h"
+#include "stdlib.h"
+#include <iostream>
 
-SkipList::SkipList()
-{
-    m_head = Node(0);
-    m_nodes.push_back(&m_head);
-}
+using namespace std;
 
-std::vector<Node *> SkipList::nodes() const
+template<class K, class V, int MAXLEVEL>
+int SkipList<K, V, MAXLEVEL>::randomLevel()
 {
-    return m_nodes;
-}
-
-void SkipList::setNodes(const std::vector<Node *> &nodes)
-{
-    m_nodes = nodes;
-}
-
-//renvois nullptr si value déjà dans skiplist
-//renvois le node qui est juste avant l'insertion
-Node *SkipList::SearchVal (int Value)
-{
-    Node* Actuel = m_head.getSon(0);
-    int Indice = Actuel->getSons().size();
-    while (Indice != -1 || Actuel->getSon(Indice)->cell() != Value)
-    {
-        if (Actuel->getSon(Indice)->cell() > Value) Indice--;
-        if (Actuel->getSon(Indice)->cell() < Value) Actuel = Actuel->getSon(Indice);
+    int height = 1;
+    while (rand() % 1 == 0 && height < MAXLEVEL) {
+        height++;
     }
-    if (Actuel->getSon(Indice)->cell() == Value) return 0;
-    else return Actuel;
+    return height;
 }
 
-std::vector <Node*> SkipList::SearchPtr (int Value)
+template<class K, class V, int MAXLEVEL>
+SkipList<K, V, MAXLEVEL>::SkipList(K minKey, K maxKey) :
+    max_current_height(1),
+    max_height(MAXLEVEL),
+    m_min_key(minKey),
+    m_max_key(maxKey)
 {
-    Node* Actuel = m_head.getSon(0);
-    std::vector <Node*> Ptrs;
-    int Indice = Actuel->getSons().size();
-    Ptrs.push_back(Actuel->getSon(Indice));
-    while (Indice != -1 || Actuel->getSon(Indice)->cell() != Value)
-    {
-        if (Actuel->getSon(Indice)->cell() > Value)
-        {
-            Indice--;
-            Ptrs.push_back(Actuel->getSon(Indice));
-        }
-        if (Actuel->getSon(Indice)->cell() < Value)
-        {
-            Actuel = Actuel->getSon(Indice);
-            Ptrs.push_back(Actuel->getSon(Indice));
-        }
+    srand(time(NULL));
+    m_head = new NODE(m_min_key);
+    m_tail = new NODE(m_max_key);
+    for (int i = 1; i < MAXLEVEL; ++i) {
+        m_head->forwards[i] = m_tail;
     }
-    return Ptrs;
 }
 
-
-void SkipList::insert(int value)
+template<class K, class V, int MAXLEVEL>
+SkipList<K, V, MAXLEVEL>::~SkipList()
 {
-    //Le premier noeud dont la valeur est inférieure à celle du nouveau
-    Node * nodeBeforeInsert = SearchVal(value);
+    NODE* curNode = m_head->forwards[1];
+    while (curNode != m_tail) {
+        NODE* tmpNode = curNode;
+        curNode = curNode->forwards[1];
+        delete tmpNode;
+    }
+    delete m_head;
+    delete m_tail;
+}
 
-    std::vector<Node *> ptrVisited = SearchPtr(value);
-
-    //Si la valeur à insérer n'est pas déjà présente dans la liste
-    if (nodeBeforeInsert != 0)
-    {
-        //Création du noeud à insérer
-        Node * nodeToInsert = new Node();
-
-        //Attribution de la valeur donnée au noeud que l'on insère
-        nodeToInsert->setCell(value);
-
-        //On lie le pointeur du noeud suivant à celui que l'on insère
-        nodeToInsert->getSons().push_back(nodeBeforeInsert->getSon(0));
-
-        //On lie le pointeur du noeud précédent à celui que l'on insère
-        nodeBeforeInsert->getSons().at(0) = nodeToInsert;
-
-        for (int i = 0; i < nodeBeforeInsert->getSons().size(); ++i)
-        {
-            //GO SKYPE ET DIS MOI CE QUE JE DOIS FAIRE POUR LE PROJET
+template<class K, class V, int MAXLEVEL>
+void SkipList<K, V, MAXLEVEL>::insert(K searchedKey, V newValue)
+{
+    Node<K, V, MAXLEVEL>* path[MAXLEVEL];
+    NODE* current = m_head;
+    for (int height = max_current_height; height >= 1; --height) {
+        while (current->forwards[height]->key < searchedKey) {
+            current = current->forwards[height];
+        }
+        path[height] = current;
+    }
+    current = current->forwards[1];
+    if (current->key == searchedKey) {
+        current->value = newValue;
+    }
+    else {
+        int newHeight = randomLevel();
+        if (newHeight > max_current_height) {
+            for (int level = max_current_height + 1; level <= newHeight; ++level) {
+                path[level] = m_head;
+            }
+            max_current_height = newHeight;
+        }
+        current = new NODE(searchedKey, newValue);
+        for (int height = 1; height <= max_current_height; ++height) {
+            current->forwards[height] = path[height]->forwards[height];
+            path[height]->forwards[height] = current;
         }
     }
 }
 
-void SkipList::remove(int value)
+template<class K, class V, int MAXLEVEL>
+void SkipList<K, V, MAXLEVEL>::remove(K searchedKey)
 {
-    Node * NodeToDeletion = SearchVal(value);
-    std::vector<Node *> ptrVisited = SearchPtr(value);
-
-    if (NodeToDeletion != 0)
-    {
-        unsigned i = 0;
-
-        //on cherche le node juste avant le node à supprimer
-        for ( ; i < ptrVisited.size(); ++i)
-            if (ptrVisited[i]->getSon(0) == NodeToDeletion) break;
-
-        //on set le fils du node précédent au fils du node à supprimer
-        ptrVisited[i]->setSon(0, NodeToDeletion->getSon(0));
-
-        //on set les fils des autres niveaux (indice 1, 2, 3...)
-
+    Node<K, V, MAXLEVEL>* path[MAXLEVEL];
+    NODE* current = m_head;
+    for (int height = max_current_height; height >= 1; --height) {
+        while (current->forwards[height]->key < searchedKey) {
+            current = current->forwards[height];
+        }
+        path[height] = current;
+    }
+    current = current->forwards[1];
+    if (current->key == searchedKey) {
+        for (int height = 1; height <= max_current_height; ++height) {
+            if (path[height]->forwards[height] != current) {
+                break;
+            }
+            path[height]->forwards[height] = current->forwards[height];
+        }
+        delete current;
+        while (max_current_height > 1 && m_head->forwards[max_current_height] == NULL) {
+            max_current_height--;
+        }
     }
 }
 
+template<class K, class V, int MAXLEVEL>
+bool SkipList<K, V, MAXLEVEL>::isEmpty() const
+{
+    return m_head->forwards[1] == m_tail;
+}
+
+template<class K, class V, int MAXLEVEL>
+void SkipList<K, V, MAXLEVEL>::displayList()
+{
+    NODE* current = m_head->forwards[1];
+    while (current != m_tail) {
+        cout << "(" << current->key << ", " << current->value << ")" << endl;
+        current = current->forwards[1];
+    }
+}
+
+template<class K, class V, int MAXLEVEL>
+const Node<K, V, MAXLEVEL>* SkipList<K, V, MAXLEVEL>::search(K searchedKey)
+{
+    typedef Node<K, V, MAXLEVEL> NodeType;
+    NodeType* current = m_head;
+    for (int height = max_current_height; height >= 1; --height) {
+        while (current->forwards[height]->key < searchedKey) {
+            current = current->forwards[height];
+        }
+    }
+    current = current->forwards[1];
+    if (current->key == searchedKey) {
+        return current;
+    }
+    else return NULL;
+}
